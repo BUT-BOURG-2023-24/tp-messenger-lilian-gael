@@ -43,7 +43,7 @@ const conversationSchema: Schema<IConversation> = new Schema<IConversation>({
 			required: true 
 		  },
 		},
-	  },
+	  }
 //A COMPLETER
 });
 

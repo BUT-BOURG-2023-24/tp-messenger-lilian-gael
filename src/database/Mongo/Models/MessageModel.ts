@@ -7,13 +7,13 @@ import ConversationModel, { IConversation } from "./ConversationModel";
 
 export interface IMessage extends Document {
 	conversationId : MongooseID;
-	from: MongooseID;
-	content: string;
-	postedAt: Date;
-	replyTo: MongooseID | null; //soit une reference à un autre msg soit null
-	edited:  boolean;
-	deleted: boolean;
-	reactions: Map<MongooseID, Reaction>; // reference à un string qui sera l'user_id(cle) et un choix parmi l'enum Reaction (valeur) 
+	from: MongooseID,
+	content: string,
+	postedAt: Date,
+	replyTo: MongooseID | null, //soit une reference à un autre msg soit null
+	edited:  boolean,
+	deleted: boolean,
+	reactions: Map<MongooseID, Reaction> | null; // reference à un string qui sera l'user_id(cle) et un choix parmi l'enum Reaction (valeur), peut être null
 	//A COMPLETER
 }
 
