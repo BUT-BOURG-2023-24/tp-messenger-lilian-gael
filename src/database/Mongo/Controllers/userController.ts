@@ -14,9 +14,9 @@ async function createUser(req: Request, res: Response) {
         
         const user = await User.findOne({ username: username });
 
-        //verification de l'existance de l'utilisateur
+        //verifie si l'utilisateur existe déjà
         if(user){
-            return res.status(400).send("User already exist");
+            return res.status(400).send("Utilisateur déjà existant");
         }
 
         //verif d'eventuelles erreurs
@@ -25,10 +25,10 @@ async function createUser(req: Request, res: Response) {
             return res.status(400).json({error: error});
         }
 
-        let hash = await bcrypt.hash(password, 5); //crypte le mdp
+        let passwordModif = await bcrypt.hash(password, 5); //crypte le mdp en bdd
 
         //Creation et ajout du new user
-        const newUser = new User({username: username, password: hash, profilePic: pictures.pickRandom()});
+        const newUser = new User({username: username, password: passwordModif, profilePic: pictures.pickRandom()}); //pickRandom pour choisir une image aléatoire dans pictures.ts
         await newUser.save();
     
         return res.status(200).send(newUser);
@@ -37,8 +37,34 @@ async function createUser(req: Request, res: Response) {
     catch (error) {
         throw new Error('Erreur lors de la création de l\'utilisateur');
     }
+
 }
+
+//recupére l'utilisateur avec son nom
+async function getUserByName(req: Request, res: Response) {
+    try {
+        const { username } = req.body; // Récupérer le nom d'utilisateur depuis le corps de la requête
+
+        if (!username) {
+            return res.status(400).json({ message: "Nom d'utilisateur manquant dans la requête" });
+        }
+
+        const user = await User.findOne({ username });
+
+        if (!user) {
+            return res.status(404).json({ message: "Utilisateur non trouvé" });
+        }
+
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).send("Erreur lors de la recherche de l'utilisateur");
+    }
+}
+
+
+
 
 module.exports = {
     createUser,
+    getUserByName,
 }
