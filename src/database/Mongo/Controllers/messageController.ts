@@ -140,7 +140,21 @@ async function reactToMessage(req: Request, res: Response) {
 
 //fonction pour récupérer un message avec son identifiant
 async function getMessageById(req: Request, res: Response) {
+    try {
+        const { id } = req.params; // Récupére l'id du message
+        const message = await Message.findOne({_id: id})
 
+        // verifie si le message existe
+        if (!message) {
+            return res.status(404).json({ message: "Message non trouvé par identifiant" });
+        }
+
+        return res.status(200).send(message);
+    }
+    catch(error) {
+        console.error(error);
+        return res.status(500).send("Erreur lors de la recherche du message par identifiant");
+    }
 }
 
 module.exports = {

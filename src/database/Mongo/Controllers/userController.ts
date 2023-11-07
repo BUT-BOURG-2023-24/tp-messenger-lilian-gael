@@ -44,28 +44,41 @@ async function getUserByName(req: Request, res: Response) {
             return res.status(400).json({ message: "Nom d'utilisateur manquant dans la requête" });
         }
         const user = await User.findOne({ username });
+        
+        //verifie si l'utilisateur existe
         if (!user) {
             return res.status(404).json({ message: "Utilisateur non trouvé" });
         }
         res.status(200).json(user);
     } catch (error) {
         console.error(error);
-        res.status(500).send("Erreur lors de la recherche de l'utilisateur");
+        res.status(500).send("Erreur lors de la recherche de l'utilisateur par nom");
     }
 }
+
+//recupere l'utilisateur avec son id
 async function getUserById(req: Request, res: Response) {
     try {
         const { id } = req.params; // Récupére l'id d'utilisateur
-        const user = await User.findOne({_id: id}).catch(() => res.status(500).send("L'utilisateur n'existe pas"));
-        return res.status(200).send(user);
+        const user = await User.findOne({_id: id});
+
+        //verifie si l'utilisateur existe
+        if (!user) {
+            return res.status(404).json({ message: "Utilisateur non trouvé" });
+        }
+
+        res.status(200).json(user);
     }
     catch(error) {
-        return res.status(500).send("Erreur lors de la recherche de l'utilisateur");
+        console.error(error);
+        return res.status(500).send("Erreur lors de la recherche de l'utilisateur par id");
     }
 }
+
+//Recupere plusieurs utilisateurs avec leur id
 async function getUsersByIds(req: Request, res: Response) {
     try {
-        const { ids } = req.body; // récupére l'id de la photo
+        const { ids } = req.body; // récupére l'id des utilisateurs
         if (!req.body || !ids) {
             return res.status(400).json({ message: "L'utilisateur n'existe pas" });
         }
@@ -73,6 +86,7 @@ async function getUsersByIds(req: Request, res: Response) {
         res.status(200).send(users);
     }
     catch(error) {
+        console.error(error);
         res.status(500).send("Erreur lors de la recherche de l'utilisateur");
     }
 }
