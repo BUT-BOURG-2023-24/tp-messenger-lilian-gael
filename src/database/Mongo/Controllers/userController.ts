@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import { Request, Response } from 'express';
 
 import User, { IUser } from '../Models/UserModel';
 import { JoiRequestValidatorInstance } from "../../../JoiRequestValidator";
@@ -35,6 +35,7 @@ async function createUser(req: Request, res: Response) {
     }
 
     catch (error) {
+        console.error(error);
         throw new Error('Erreur lors de la création de l\'utilisateur');
     }
 
@@ -43,7 +44,7 @@ async function createUser(req: Request, res: Response) {
 //recupére l'utilisateur avec son nom
 async function getUserByName(req: Request, res: Response) {
     try {
-        const { username } = req.body; // Récupérer le nom d'utilisateur depuis le corps de la requête
+        const { username } = req.body; // recupere le nom de l'utilisateur
 
         if (!username) {
             return res.status(400).json({ message: "Nom d'utilisateur manquant dans la requête" });
@@ -57,6 +58,7 @@ async function getUserByName(req: Request, res: Response) {
 
         res.status(200).json(user);
     } catch (error) {
+        console.error(error);
         res.status(500).send("Erreur lors de la recherche de l'utilisateur");
     }
 }
