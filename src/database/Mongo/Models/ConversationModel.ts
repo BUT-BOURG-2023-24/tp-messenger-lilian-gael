@@ -2,7 +2,7 @@ import mongoose, { Schema, Document } from "mongoose";
 import { MongooseID } from "../../../types";
 
 import UserModel, { IUser } from "./UserModel";
-import { MessageModel } from "./MessageModel";
+import MessageModel, {IMessage} from "./MessageModel";
 
 
 
@@ -20,11 +20,11 @@ const conversationSchema: Schema<IConversation> = new Schema<IConversation>({
 	participants: [
 		{
 		  type: Schema.Types.ObjectId, //tableau d'identifiants d'objet avec comme référence User
-		  ref: "UserModel", // Référence au modèle User
+		  ref: "UserModel",
 		},
 	],
 	messages: [{
-		type: Schema.Types.ObjectId,
+		type: Schema.Types.ObjectId, //tableau d'identifiants d'objet avec comme référence Message
 		ref: "MessageModel"
 	}],
 

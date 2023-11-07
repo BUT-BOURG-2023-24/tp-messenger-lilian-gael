@@ -55,7 +55,7 @@ async function getUserByName(req: Request, res: Response) {
 }
 async function getUserById(req: Request, res: Response) {
     try {
-        const { id } = req.params; // Récupérer l'id d'utilisateur depuis l'URL
+        const { id } = req.params; // Récupére l'id d'utilisateur
         const user = await User.findOne({_id: id}).catch(() => res.status(500).send("L'utilisateur n'existe pas"));
         return res.status(200).send(user);
     }
@@ -65,7 +65,7 @@ async function getUserById(req: Request, res: Response) {
 }
 async function getUsersByIds(req: Request, res: Response) {
     try {
-        const { ids } = req.body; // récupérer l'id de la photo depuis la requête
+        const { ids } = req.body; // récupére l'id de la photo
         if (!req.body || !ids) {
             return res.status(400).json({ message: "L'utilisateur n'existe pas" });
         }
