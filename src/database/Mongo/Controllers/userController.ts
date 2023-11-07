@@ -11,26 +11,20 @@ async function createUser(req: Request, res: Response) {
     try {
 
         const { username, password } = req.body; //recupere les donnees d'inscription
-        
         const user = await User.findOne({ username: username });
-
         //verifie si l'utilisateur existe déjà
         if(user){
             return res.status(400).send("Utilisateur déjà existant");
         }
-
         //verif d'eventuelles erreurs
         const { error } = JoiRequestValidatorInstance.validate(req);
         if(error) {
             return res.status(400).json({error: error});
         }
-
         let passwordModif = await bcrypt.hash(password, 5); //crypte le mdp en bdd
-
         //Creation et ajout du new user
         const newUser = new User({username: username, password: passwordModif, profilePic: pictures.pickRandom()}); //pickRandom pour choisir une image aléatoire dans pictures.ts
         await newUser.save();
-    
         return res.status(200).send(newUser);
     }
 
@@ -44,19 +38,38 @@ async function createUser(req: Request, res: Response) {
 async function getUserByName(req: Request, res: Response) {
     try {
         const { username } = req.body; // Récupérer le nom d'utilisateur depuis le corps de la requête
-
         if (!username) {
             return res.status(400).json({ message: "Nom d'utilisateur manquant dans la requête" });
         }
-
         const user = await User.findOne({ username });
-
         if (!user) {
             return res.status(404).json({ message: "Utilisateur non trouvé" });
         }
-
         res.status(200).json(user);
     } catch (error) {
+        res.status(500).send("Erreur lors de la recherche de l'utilisateur");
+    }
+}
+async function getUserById(req: Request, res: Response) {
+    try {
+        const { id } = req.params; // Récupérer l'id d'utilisateur depuis l'URL
+        const user = await User.findOne({_id: id}).catch(() => res.status(500).send("L'utilisateur n'existe pas"));
+        return res.status(200).send(user);
+    }
+    catch(error) {
+        return res.status(500).send("Erreur lors de la recherche de l'utilisateur");
+    }
+}
+async function getUsersByIds(req: Request, res: Response) {
+    try {
+        const { ids } = req.body; // récupérer l'id de la photo depuis la requête
+        if (!req.body || !ids) {
+            return res.status(400).json({ message: "L'utilisateur n'existe pas" });
+        }
+        const users = await User.find({ _id: { $in: ids } }).catch((error: Error) => res.status(500).json({error: error}));
+        res.status(200).send(users);
+    }
+    catch(error) {
         res.status(500).send("Erreur lors de la recherche de l'utilisateur");
     }
 }
@@ -67,4 +80,7 @@ async function getUserByName(req: Request, res: Response) {
 module.exports = {
     createUser,
     getUserByName,
+    getUserById,
+    getUsersByIds,
+
 }
