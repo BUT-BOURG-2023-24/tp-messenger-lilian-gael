@@ -1,29 +1,29 @@
+import {createUser, getUserByName, getUserById,getUsersByIds,} from "../database/Mongo/Controllers/userController";
 const express = require('express')
 const router = express.Router()
-const userController = require('../database/Mongo/Controllers/userController')
-const auth = require('../auth')
+import {checkAuth} from "../middleware/auth";
 
 router.post(
     '/users/create',
-    userController.createUser
+    createUser
 )
 
 router.get(
     '/users/name/:username',
-    auth.checkAuth,
-    userController.getUserByName
+    checkAuth,
+    getUserByName
 )
 
 router.get(
     '/users/:id',
-    auth.checkAuth,
-    userController.getUserById
+    checkAuth,
+    getUserById
 )
 
 router.get(
     '/users',
-    auth.checkAuth,
-    userController.getUsersByIds
+    checkAuth,
+    getUsersByIds
 )
 
 module.exports = router

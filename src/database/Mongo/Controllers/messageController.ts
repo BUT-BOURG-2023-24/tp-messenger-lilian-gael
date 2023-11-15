@@ -5,7 +5,7 @@ import User, { IUser } from '../Models/UserModel';
 import { JoiRequestValidatorInstance } from "../../../JoiRequestValidator";
 
 //fonction de creation de message
-async function createMessage(req: Request, res: Response) {
+export async function createMessage(req: Request, res: Response) {
     try {
 
         const { conversationId, from, content, postedAt, replyTo, edited, deleted } = req.body; //recupere les donnees du message
@@ -37,7 +37,7 @@ async function createMessage(req: Request, res: Response) {
 }
 
 //fonction pour modifier le message
-async function editMessage(req: Request, res: Response) {
+export async function editMessage(req: Request, res: Response) {
     try {
         // recupere les donnees du message à modifier
         const { messageId } = req.params;
@@ -65,7 +65,7 @@ async function editMessage(req: Request, res: Response) {
 }
 
 //fonction pour supprimer le message les messages supprimés seront toujours présents en bdd mais pas affichés dans la conv
-async function deleteMessage(req: Request, res: Response) {
+export async function deleteMessage(req: Request, res: Response) {
     try {
         const { messageId } = req.params; // recupere l'id du msg à supprimer 
 
@@ -89,7 +89,7 @@ async function deleteMessage(req: Request, res: Response) {
 }
 
 //fonction pour réagir au message
-async function reactToMessage(req: Request, res: Response) {
+export async function reactToMessage(req: Request, res: Response) {
     try{
         // recupere l'id du message, l'id de l'utilisateur et la reaction à ajouter
         const { messageId, userId } = req.params;
@@ -139,7 +139,7 @@ async function reactToMessage(req: Request, res: Response) {
 }
 
 //fonction pour récupérer un message avec son identifiant
-async function getMessageById(req: Request, res: Response) {
+export async function getMessageById(req: Request, res: Response) {
     try {
         const { id } = req.params; // Récupére l'id du message
         const message = await Message.findOne({_id: id})

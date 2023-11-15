@@ -1,6 +1,5 @@
 import { type Request, type Response, type NextFunction } from 'express'
-import config from './config'
-
+import config from '../config'
 const jwt = require('jsonwebtoken')
 require('dotenv/config')
 
@@ -8,8 +7,9 @@ interface CustomResponse extends Response {
     userId?: string
 }
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+
 export async function checkAuth (req: Request, res: CustomResponse, next: NextFunction) {
+    //Récupère le token
     const token = req.headers.authorization
     if (!token) {
         return res.status(401).json({ error: 'Need a token!' })
@@ -21,9 +21,8 @@ export async function checkAuth (req: Request, res: CustomResponse, next: NextFu
     if (req.body.userId && req.body.userId !== userId) {
         return res.status(401).json({ error: 'Invalid token!' })
     }
-
+    //ID du user ajouter à l'objet
     req.body.user = { id: userId }
-
     next()
 }
 

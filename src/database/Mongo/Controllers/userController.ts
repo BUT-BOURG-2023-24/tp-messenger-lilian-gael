@@ -7,7 +7,7 @@ const pictures = require("../../../pictures");
 const bcrypt = require('bcrypt');
 
 //fonction de creation d'utilisateur
-async function createUser(req: Request, res: Response) {
+export async function createUser(req: Request, res: Response) {
     try {
 
         const { username, password } = req.body; //recupere les donnees d'inscription
@@ -36,7 +36,7 @@ async function createUser(req: Request, res: Response) {
 }
 
 //recupére l'utilisateur avec son nom
-async function getUserByName(req: Request, res: Response) {
+export async function getUserByName(req: Request, res: Response) {
     try {
         const { username } = req.body; // recupere le nom de l'utilisateur
 
@@ -57,7 +57,7 @@ async function getUserByName(req: Request, res: Response) {
 }
 
 //recupere l'utilisateur avec son id
-async function getUserById(req: Request, res: Response) {
+export async function getUserById(req: Request, res: Response) {
     try {
         const { id } = req.params; // Récupére l'id d'utilisateur
         const user = await User.findOne({_id: id});
@@ -76,7 +76,7 @@ async function getUserById(req: Request, res: Response) {
 }
 
 //Recupere plusieurs utilisateurs avec leur id
-async function getUsersByIds(req: Request, res: Response) {
+export async function getUsersByIds(req: Request, res: Response) {
     try {
         const { ids } = req.body; // récupére l'id des utilisateurs
         if (!req.body || !ids) {
@@ -91,13 +91,3 @@ async function getUsersByIds(req: Request, res: Response) {
     }
 }
 
-
-
-
-module.exports = {
-    createUser,
-    getUserByName,
-    getUserById,
-    getUsersByIds,
-
-}
