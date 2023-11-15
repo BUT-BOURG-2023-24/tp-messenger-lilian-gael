@@ -9,21 +9,31 @@ interface CustomResponse extends Response {
 
 
 export async function checkAuth (req: Request, res: CustomResponse, next: NextFunction) {
-    //Récupère le token
-    const token = req.headers.authorization
+    //recupere le token de l'utilisateur
+    const token = req.headers.authorization as string | undefined;
+
+    //si pas de token retourne l'erreur
     if (!token) {
-        return res.status(401).json({ error: 'Need a token!' })
+        return res.status(401).json({ error: 'Besoin d\'un token!' });
     }
 
-    const decodedToken = jwt.verify(token, config.SECRET_JWT_KEY)
-    const userId = decodedToken.userId
+    try{
+        const decodedToken: any = jwt.verify(token, process.env.SECRET_JWT_KEY); //decode le token
+        const userId: string = decodedToken.userId; //recupere l'id de l'user
 
-    if (req.body.userId && req.body.userId !== userId) {
-        return res.status(401).json({ error: 'Invalid token!' })
+        if (req.body.userId && req.body.userId !== userId) {
+            return res.status(401).json({ error: 'Mauvais token' });
+        }
+
+        req.body.user = { id: userId };
+        next();
     }
-    //ID du user ajouter à l'objet
-    req.body.user = { id: userId }
-    next()
+
+    catch (error) {
+        return res.status(401).json({ error: 'Probleme avec le token' });
+    }
+
+
 }
 
 module.exports = {
