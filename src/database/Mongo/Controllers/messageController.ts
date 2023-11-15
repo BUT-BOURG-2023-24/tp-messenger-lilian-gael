@@ -64,7 +64,7 @@ async function editMessage(req: Request, res: Response) {
     }
 }
 
-//fonction pour supprimer le message les messages supprimés seront toujours présents en bdd mais pas affichés dans la conv
+//fonction pour supprimer le message, les messages supprimés seront toujours présents en bdd mais pas affichés dans la conv
 async function deleteMessage(req: Request, res: Response) {
     try {
         const { messageId } = req.params; // recupere l'id du msg à supprimer 
