@@ -1,53 +1,212 @@
-import { Request, Response } from "express";
+import { type Request, type Response } from 'express'
+import { JoiRequestValidatorInstance } from '../../../JoiRequestValidator'
 import Conversation, { IConversation } from '../Models/ConversationModel';
-import { JoiRequestValidatorInstance } from "../../../JoiRequestValidator";
-import Message from "../Models/MessageModel";
 
- export async function createConversation(req: Request, res: Response) {
+
+//recupere les participants de la conversation
+async function getConversationWithParticipants(req: Request, res: Response) {
+
     try {
-        // RÈcupÈrer les donnÈes nÈcessaires depuis le corps de la requÍte
-        const { participants, title, lastUpdate } = req.body;
-
-        // VÈrifiez que les donnÈes obligatoires sont prÈsentes dans la requÍte
-        if (!participants || !title || !lastUpdate) {
-            return res.status(400).json({ message: "DonnÈes manquentes pour la crÈation de conversation " });
+        //Recupere les utilisateurs de la conversation
+        const { userOne, userTwo } = req.body
+        const conversation = await Conversation.findOne({
+          participants: { $all: [userOne, userTwo] } //all = mongo pour s'assurer que userOne et userTwo sont pr√©sents
+        }) ;
+        
+        //verifie si la conv existe
+        if (conversation) {
+          return res.status(200).send({ conversation });
         }
+        else {
+          return res.status(404).send({conversation: "Conversation non trouv√©e"});
+        }
+    }
 
-        const newConversation: IConversation = new Conversation({
-            participants, // Tableau d'identifiants d'utilisateurs
-            title,
-            lastUpdate,
-            messages: [], // Initialisez le tableau de messages vide ou avec les messages existants
-            seen: [] // Initialisez les vus ‡ vide ou avec les vus existants
-        });
-
-        // Enregistrez la nouvelle conversation dans la base de donnÈes
-        await newConversation.save();
-
-        // RÈponse de succËs
-        res.status(201).json(newConversation);
-    } catch (error) {
-        console.error("Erreur lors de la crÈation de la conversation :", error);
-        res.status(500).json({ message: "Erreur lors de la crÈation de la conversation" });
+    catch (error) {
+        console.error(error);
+        throw new Error('Erreur lors de la r√©cup√©ration des participants de la conversation');
     }
 }
 
-export async function getConversationWithParticipants(req: Request, res: Response) {
+//recup√©re les conversations d'un utilisateur
+async function getAllConversationsForUser(req: Request, res: Response) {
+    try {
+        //recup l'id de l'user
+        const { idUser } = req.params;
+
+        //recup les conversations de l'user
+        const conversations = await Conversation.find({
+            participants: { $in: [idUser] } //in = mongo pour s'assurer que l'id user est pr√©sent
+        });
+
+        //verifie s'il a des conversations
+        if(conversations){
+            return res.status(200).send({ conversations });
+        }
+        else {
+            return res.status(404).send("Aucune conversation n'a pu √™tre trouv√©e");
+        }
+    }
+
+    catch (error) {
+        console.error(error);
+        throw new Error('Erreur lors de la r√©cup√©ration des conversations de l\'utilisateur ');
+    }
 }
 
-export async function getAllConversationsForUser(req: Request, res: Response) {
+//recupere la conversation gr√¢ce √† son id
+async function getConversationById(req: Request, res: Response, idConversation: number) {
+    try {
+        const { idConv } = req.params; //recupere l'id de la conversation
+        const conversation = await Conversation.findById(idConv); //recupere la conversation avec son id (findById)
+
+        //v√©rifie que la conversation existe
+        if (conversation) {
+          return res.status(200).send({ conversation });
+        } 
+        else {
+          return res.status(404).send({conversation: "la conversation n'a pas pu √™tre trouv√©e"});
+        }
+    }
+
+    catch (error) {
+        console.error(error);
+        throw new Error('Erreur lors de la r√©cup√©ration de conversation par id');
+    }
 }
 
-export async function getConversationById(req: Request, res: Response) {
+//creer une nouvelle conversation
+async function createConversation(req: Request, res: Response) {
+    try {
+        const { participants, messages, title } = req.body; //recupere les infos de la conversation
+        const lastUpdate = new Date(); //Derniere modif de la conversation
+
+        //verif d'eventuelles erreurs
+        const { error } = JoiRequestValidatorInstance.validate(req);
+        if(error) {
+            return res.status(400).json({error: error});
+        }
+
+        const newConversation = new Conversation({
+            participants,
+            messages,
+            title,
+            lastUpdate
+        });
+
+        await newConversation.save(); //enregistre en bdd
+
+        return res.status(200).send(newConversation);
+    }
+
+    catch (error) {
+        console.error(error);
+        throw new Error('Erreur lors de la cr√©ation de conversation');
+    }
+}
+
+//ajoute un message √† la conversation
+async function addMessageToConversation(req: Request, res: Response) {
+    try {
+        const { idConversation } = req.params; //recupere l'id de la conversation
+        const { addedMessage } = req.body; //recupere le message
+
+        //verif d'eventuelles erreurs
+        const { error } = JoiRequestValidatorInstance.validate(req)
+        if (error) {
+            return res.status(400).json({ error });
+        }
+    
+        const updatedConversation = await Conversation.findOneAndUpdate(
+          { _id: idConversation }, //pour trouver la conversation
+          { $push: { messages: addedMessage } }, //ajoute le message √† la liste des messages de la conversation
+          { new: true } //mets √† jour la conv
+        );
+    
+        //v√©rifie que la conversation est bien ajout√©e
+        if (updatedConversation) {
+          return res.status(200).json(updatedConversation);
+        } 
+        else {
+          return res.status(404).send({updatedConversation: "Le message n'a pas pu √™tre ajout√©"});
+        }
+    }
+
+    catch (error) {
+        console.error(error);
+        throw new Error('Erreur lors de l\ajout du message √† la conversation');
+    }
+}
+
+async function setConversationSeenForUserAndMessage(req: Request, res: Response) { //ici aide
+    try {
+        type MongooseID = string;
+
+
+        const { idConversation } = req.params; //recupere l'id de la conversation 
+        const { user, message } = req.body; //recupere l'user et le dernier message
+        //verif d'eventuelles erreurs
+        const { error } = JoiRequestValidatorInstance.validate(req);
+        if (error) {
+            return res.status(400).json({ error });
+        }
+
+        const conversation = await Conversation.findById(idConversation); //recup la conversation avec son id
+        if (!conversation) {
+            return res.status(404).send({conversation: "conversation non trouv√©e"});
+        }
+
+        const updateSeen = new Map<string, MongooseID>(Object.entries({
+            [user.id.toString()]: message
+          })) || new Map<string, MongooseID>();
+        console.log("updateSeen: " + updateSeen); //debug
+
+        const { modifiedCount } = await Conversation.updateOne(
+            { _id: idConversation },
+            { seen: updateSeen }
+        ); //modifie la valeurs de seen
+
+        if (modifiedCount == 0) {
+            return res.status(400).send({conversation: "erreur avec la conversation"});
+        } 
+        else {
+            return res.status(200).json(conversation);
+        }
+    }
+
+    catch (error) {
+        console.error(error);
+        throw new Error('Erreur lors de setConversationSeenForUserAndMessage');
+    }
+}
+
+//supprime une conversation
+async function deleteConversation(req: Request, res: Response) {
+    try {
+        const { idConversation } = req.params; //recupere l'id de la conversation
+
+        const deletedProductData = await Conversation.findByIdAndRemove(idConversation); //trouve la conv avec son id et la supprime
+        if (deletedProductData) {
+          return res.status(200).send({conversation: "conversation supprim√©e"});
+        }
+        else {
+            return res.status(404).send({conversation: "Conversation non trouv√©e"});
+        }
+    }
+
+    catch (error) {
+        console.error(error);
+        throw new Error('Erreur lors de la suppression de la conversation');
+    }
 }
 
 
-
-export async function addMessageToConversation(req: Request, res: Response) {
+module.exports = {
+    getConversationWithParticipants,
+    getAllConversationsForUser,
+    getConversationById,
+    createConversation,
+    addMessageToConversation,
+    setConversationSeenForUserAndMessage,
+    deleteConversation
 }
-
-export async function setConversationSeenForUserAndMessage(req: Request, res: Response) {
-}
-export async function deleteConversation(req: Request, res: Response) {
-}
-
