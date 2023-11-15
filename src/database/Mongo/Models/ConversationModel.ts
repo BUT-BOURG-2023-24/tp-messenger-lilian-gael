@@ -1,9 +1,7 @@
 import mongoose, { Schema, Document } from "mongoose";
 import { MongooseID } from "../../../types";
 
-import UserModel, { IUser } from "./UserModel";
-import { MessageModel } from "./MessageModel";
-
+// import UserModel, { IUser } from "./UserModel";
 
 
 export interface IConversation extends Document {
