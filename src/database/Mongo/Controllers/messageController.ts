@@ -7,8 +7,9 @@ import { JoiRequestValidatorInstance } from "../../../JoiRequestValidator";
 //fonction de creation de message
 export async function createMessage(req: Request, res: Response) {
     try {
+        const postedAt = new Date(); //date actuelle du nouveau msg
 
-        const { conversationId, from, content, postedAt, replyTo, edited, deleted } = req.body; //recupere les donnees du message
+        const { conversationId, from, content, replyTo, edited, deleted } = req.body; //recupere les donnees du message
 
         //verif d'eventuelles erreurs
         const { error } = JoiRequestValidatorInstance.validate(req);

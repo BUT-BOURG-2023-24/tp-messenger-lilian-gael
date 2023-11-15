@@ -45,7 +45,6 @@ const conversationSchema: Schema<IConversation> = new Schema<IConversation>({
 		  },
 		},
 	  }
-//A COMPLETER
 });
 
 const ConversationModel = mongoose.model<IConversation>("Conversation", conversationSchema);

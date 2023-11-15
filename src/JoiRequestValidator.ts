@@ -1,4 +1,4 @@
-import * as joi from "joi";
+import * as joi from "joi"; //npm install joi; npm install @types/joi;npm install joi --save-dev;npm install @types/joi --save-dev;
 import { Request } from "express";
 
 interface JoiRequestValidatorResponse
@@ -17,6 +17,59 @@ class JoiRequestValidator
 {
 	validators: JoiRouteValidator[] = 
 	[
+		{
+			route: "", //creation d'user, changements dans usercontroller et userRoutes, peut-être pareil pour message et conversation
+			method:"POST",
+			validatorSchema: joi.Object({
+				username: joi.string().required(),
+				password: joi.password.string().min(6).required()
+			})
+		},
+		
+		{
+			route: "/messages/create",
+			method:"POST",
+			validatorSchema: joi.Object({ //peut-être rajouter l'id
+				conversationId: joi.integer().required(), //si integer existe
+				from: joi.string().required(),
+				content: joi.string().required(),
+				replyTo: joi.string().allow(null),
+				edited: joi.boolean(),
+				deleted: joi.boolean(),
+			})
+		},
+		
+        {
+            route: "/conversation/create",
+            method: "POST",
+            validatorSchema: joi.object({
+                participants: joi.array().items(joi.string()).required(),
+                messages: joi.array().items(joi.string()).required(),
+                title: joi.string().required(),
+            }),
+        },
+
+		{
+            route: "/message/:id/react",
+            method: "POST",
+            validatorSchema: joi.object({
+                reaction: joi.string().required(),
+            })
+        },
+
+		{
+            route: "/message/:id/edit",
+            method: "POST",
+            validatorSchema: joi.object({
+				route: "/message/:id/edit",
+				method: "POST",
+				validatorSchema: joi.object({
+					content: joi.string().required(),
+					edited: joi.boolean().required(), //peut-être mettre juste 1 à la place car il est edit
+				})
+            })
+        },
+
 		// EXEMPLE
 		// {
 		// 	route: "/conversations/:id",

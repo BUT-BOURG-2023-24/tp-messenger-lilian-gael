@@ -44,7 +44,6 @@ const MessageSchema: Schema<IMessage> = new Schema<IMessage>({
 		type: Map,
 		of: Reaction,
 	},
-	//A COMPLETER
 });
 
 const MessageModel = mongoose.model<IMessage>("Message", MessageSchema);
