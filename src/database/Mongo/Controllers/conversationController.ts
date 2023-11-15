@@ -183,9 +183,9 @@ async function setConversationSeenForUserAndMessage(req: Request, res: Response)
 //supprime une conversation
 async function deleteConversation(req: Request, res: Response) {
     try {
-        const { idConversation } = req.params;
+        const { idConversation } = req.params; //recupere l'id de la conversation
 
-        const deletedProductData = await Conversation.findByIdAndRemove(idConversation);
+        const deletedProductData = await Conversation.findByIdAndRemove(idConversation); //trouve la conv avec son id et la supprime
         if (deletedProductData) {
           return res.status(200).send({conversation: "conversation supprimée"});
         }
