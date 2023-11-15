@@ -4,7 +4,7 @@ import Conversation, { IConversation } from '../Models/ConversationModel';
 
 
 //recupere les participants de la conversation
-async function getConversationWithParticipants(req: Request, res: Response) {
+export async function getConversationWithParticipants(req: Request, res: Response) {
 
     try {
         //Recupere les utilisateurs de la conversation
@@ -29,7 +29,7 @@ async function getConversationWithParticipants(req: Request, res: Response) {
 }
 
 //recupére les conversations d'un utilisateur
-async function getAllConversationsForUser(req: Request, res: Response) {
+export async function getAllConversationsForUser(req: Request, res: Response) {
     try {
         //recup l'id de l'user
         const { idUser } = req.params;
@@ -55,7 +55,7 @@ async function getAllConversationsForUser(req: Request, res: Response) {
 }
 
 //recupere la conversation grâce à son id
-async function getConversationById(req: Request, res: Response, idConversation: number) {
+export async function getConversationById(req: Request, res: Response, idConversation: number) {
     try {
         const { idConv } = req.params; //recupere l'id de la conversation
         const conversation = await Conversation.findById(idConv); //recupere la conversation avec son id (findById)
@@ -76,7 +76,7 @@ async function getConversationById(req: Request, res: Response, idConversation: 
 }
 
 //creer une nouvelle conversation
-async function createConversation(req: Request, res: Response) {
+export async function createConversation(req: Request, res: Response) {
     try {
         const { participants, messages, title } = req.body; //recupere les infos de la conversation
         const lastUpdate = new Date(); //Derniere modif de la conversation
@@ -106,7 +106,7 @@ async function createConversation(req: Request, res: Response) {
 }
 
 //ajoute un message à la conversation
-async function addMessageToConversation(req: Request, res: Response) {
+export async function addMessageToConversation(req: Request, res: Response) {
     try {
         const { idConversation } = req.params; //recupere l'id de la conversation
         const { addedMessage } = req.body; //recupere le message
@@ -138,7 +138,7 @@ async function addMessageToConversation(req: Request, res: Response) {
     }
 }
 
-async function setConversationSeenForUserAndMessage(req: Request, res: Response) { //ici aide
+export async function setConversationSeenForUserAndMessage(req: Request, res: Response) { //ici aide
     try {
         type MongooseID = string;
 
@@ -181,7 +181,7 @@ async function setConversationSeenForUserAndMessage(req: Request, res: Response)
 }
 
 //supprime une conversation
-async function deleteConversation(req: Request, res: Response) {
+export async function deleteConversation(req: Request, res: Response) {
     try {
         const { idConversation } = req.params; //recupere l'id de la conversation
 
@@ -200,13 +200,3 @@ async function deleteConversation(req: Request, res: Response) {
     }
 }
 
-
-module.exports = {
-    getConversationWithParticipants,
-    getAllConversationsForUser,
-    getConversationById,
-    createConversation,
-    addMessageToConversation,
-    setConversationSeenForUserAndMessage,
-    deleteConversation
-}
